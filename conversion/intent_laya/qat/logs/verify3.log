@@ -1,0 +1,4 @@
+[08:35:00] mode=verify tag=verify3
+[08:35:00] [fp32-path, quant disabled] gold_acc=1.0000 fp32_agree=1.0000
+[08:35:01] [FAITHFUL w8a16 sim, PTQ] gold_acc=0.4583 fp32_agree=0.4583  (expect ~0.42 to match on-device 42.5%)
+[08:35:01] verify done.

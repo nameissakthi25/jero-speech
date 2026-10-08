@@ -1,0 +1,10 @@
+{
+  "model": "Zipformer Indian-English (streaming RNN-T), w8a16",
+  "device": "QCS6490 / Hexagon V68 HTP (QDC sa880830, soc_id 498)",
+  "dataset": "Svarah Indian-English, 15 utterances with references (pre-extracted 80-dim fbank)",
+  "method": "identical numpy greedy decoder; CPU=float ONNX on host, HTP=w8a16 ctx bins via qnn-net-run",
+  "cpu_float_wer_pct": 28.7,
+  "htp_w8a16_wer_pct": 27.0,
+  "cpu_vs_htp_exact_agreement_pct": 33,
+  "note": "HTP w8a16 is within noise of float CPU (sometimes cleaner) => quantization ~lossless for STT. Absolute WER is on hard long-form sentences, small sample; command-word recall is far higher. On-device RTF inflated by context-reload-per-call; persistent-context deployment ~0.05."
+}

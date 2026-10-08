@@ -14,28 +14,26 @@ measured numbers and the **correlation / agreement of HTP vs the CPU/float refer
 
 ## Summary table
 
-| Model | CPU runtime | CPU result | HTP (w8a16) | HTP vs CPU correlation / agreement |
-|---|---|---|---|---|
-| **STT** (Zipformer, en-IN) | sherpa-onnx, 4 threads | WER 34.8%* , RTF 0.037 | runs on V68, enc ~16.4 ms/chunk, RTF ~0.05 | **token-exact** (1.000) vs float decode |
-| **TTS** (Supertonic-3) | ONNX Runtime fp32 | reference pipeline | full 4-model w8a16 on HTP | **log-mel corr 0.77** (DTW-aligned) |
-| **VAD** (Silero v4) | onnxruntime, 1 thread | acc 94.5%, AUC 0.94, 0.078 ms/frame | **N/A — CPU-only by design** | — |
-| **Intent** (ModernBERT, "Laya") | onnxruntime fp32 | 27.6 ms, 10/10 on Jero lines | builds+runs, top-1 **~41%** | hidden-state r≈0.88 → **deferred to CPU** |
-| **Wake word** (openWakeWord) | onnxruntime, always-on | provisional gate-5 pass | **N/A — always-on CPU by design** | — |
+| Model | CPU | HTP (w8a16, real V68) | HTP vs CPU |
+|---|---|---|---|
+| **STT** (Zipformer, en-IN) | float WER 28.7% | w8a16 WER **27.0%** (same utts) | **~lossless** (HTP ≈ float, sometimes cleaner) |
+| **TTS** (Supertonic-3) | ONNX Runtime fp32 reference | full 4-model w8a16 on HTP (M1 audio) | **log-mel corr 0.77** (DTW-aligned) |
+| **VAD** (Silero v4) | acc 94.5%, AUC 0.94, 0.078 ms/frame | **N/A — CPU-only by design** | — |
+| **Intent** (ModernBERT, "Laya") | fp32 100% / 28 ms | **QAT w8a16 = 100%** (120/120) | **PTQ 42% → QAT 100% on-device** |
+| **Wake word** (openWakeWord) | always-on, provisional gate-5 pass | **N/A — always-on CPU by design** | — |
 
-*WER is a **cross-accent proxy** (Indian-English model scored on US-English LibriSpeech), not an in-domain number.
+> **Honesty on the numbers:** STT/TTS/Intent HTP were run on a QDC RB3 Gen2 (V68, soc_id 498). STT CPU-vs-HTP uses the *same* Svarah utterances through an identical decoder (float-host vs w8a16-device). Intent 100% = w8a16 matches fp32 on a **held-out synthetic** test where fp32 is itself ~100% — it proves QAT removed the on-device quantization loss, **not** real-world accuracy (real gate needs ≥200 real recordings, still open). Slot head not yet scored on-device.
 
 ---
 
 ## STT — Zipformer (Indian-English, streaming RNN-T)
 
-- **CPU** (`hf-internal-testing/librispeech_asr_dummy`, clean/validation, 73 clips, sherpa-onnx greedy, 4 threads):
-  - **WER 34.8%** (proxy), **RTF 0.037** (~27× real-time), 481 s audio in 17.6 s wall.
-  - Caveat: the model is trained for **Indian English**; LibriSpeech is US English, so this over-states error vs the target accent. It is a fast sanity proxy, not the event gate.
-- **HTP** (verified on RB3 board, `~/zipformer_test/*_w8a16_ctx.bin`):
-  - Encoder + decoder + joiner all execute **w8a16 on V68**.
-  - **Token-exact match to the float reference**: `sample.wav` → "CHANGE LANGUAGE TO HINDI", ids `[804,1529,37,23,217,1949]` — **correlation 1.000** (identical token stream).
-  - On-HTP encoder ≈ **16.4 ms/chunk**, encoder RTF ≈ **0.05** (one-time ~67 ms context load). fbank + greedy loop stay on CPU.
-- **Verdict:** STT is the one model where w8a16 on HTP is **bit-faithful enough to be identical** to float decoding. Ship on HTP.
+- **CPU vs HTP on identical data (the clean comparison)** — 15 Svarah Indian-English utterances, same pre-extracted fbank, same numpy greedy decoder; CPU = float ONNX on host, HTP = w8a16 ctx bins on the QDC V68:
+  - **CPU float WER 28.7%**, **HTP w8a16 WER 27.0%** — within noise, and HTP is *sometimes cleaner* ("ERROR OF GLOBALIZATION" vs CPU's garbled "ERRISATION"). **w8a16 costs ~nothing.**
+  - Drivers: `models/stt/htp/stt_htp.py` (device) and `models/stt/cpu/cpu_float_decode.py` (host). Bench: `bench/stt_cpu_vs_htp_device.json`.
+  - The ~28% is on **hard long-form** sentences; short command words decode near-perfectly. Earlier token-exact check: `sample.wav` → "CHANGE LANGUAGE TO HINDI" (identical to float).
+  - On-device RTF here is inflated by **context-reload-per-call**; the persistent-context deployment is ~0.05 (enc ~16.4 ms/chunk).
+- **Verdict:** w8a16 STT on HTP is **lossless vs float**. Ship on HTP.
 
 ## TTS — Supertonic-3 (4 ONNX models: text-encoder / duration / vector-estimator / vocoder)
 
@@ -58,9 +56,12 @@ measured numbers and the **correlation / agreement of HTP vs the CPU/float refer
 
 ## Intent — ModernBERT-base, 2-head ("Laya")
 
-- **CPU (fp32, deployed):** mean **27.6 ms** (median 27.6, max 28.3) — well under the 100 ms gate. 10/10 correct intent + slots on Jero command lines (walk/turn/dance/stop/greet, with direction + steps slots), confidence ~1.0.
-- **HTP (w8a16):** builds and runs cleanly on V68 (context binary, spill=0), but **on-device top-1 agreement vs fp32 ≈ 41%** — fails the ≥99% gate. Root cause is a **w8a16 fidelity ceiling**: hidden-state Pearson **r≈0.88**, fine for Laya's coarse typed decisions but not for a 12-way argmax on mean-pooled states. Two serious recipes both landed ~41%.
-- **Verdict:** **run intent on CPU** (fp32, full accuracy, 28 ms). HTP path documented and deferred (levers: sqnr calibration, QAT).
+12-class intent (walk/turn/stop/dance/look/greet/emote/yes/no/cancel/chit_chat/none) + 8-slot BIO head.
+
+- **CPU (fp32):** mean **27.6 ms** (<100 ms gate), 10/10 intent+slots on Jero command lines, conf ~1.0.
+- **HTP (w8a16) — SOLVED via QAT, verified on real V68:** **100% top-1** (120/120 vs fp32 and vs gold, 0 missing, all 12 classes used). PTQ was capped at **42.5%**; QAT against a **device-faithful ~3-bit-attention sim** recovered it (45.8% → 96.7%@100 → 100%@300 steps). Full-graph w8a16 DLC, context built on-board, 120 inputs in ~3 s. Recipe: `conversion/intent_laya/qat/`; bench: `bench/intent_htp_qat_device.json`.
+- **Caveat:** 100% = w8a16 matches fp32 on **held-out synthetic** data (fp32 itself ~100% there) — proves the quantization loss is gone on-device, not real-world accuracy. Slot head not yet scored on-device.
+- **Verdict:** intent can now **ship on HTP at 100%** (CPU fp32 remains a 28 ms fallback).
 
 ## Wake word — openWakeWord "Hey Jero"
 

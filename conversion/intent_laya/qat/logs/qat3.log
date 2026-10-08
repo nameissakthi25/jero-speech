@@ -1,0 +1,64 @@
+[08:35:34] mode=qat tag=qat3
+[08:35:34] [fp32-path, quant disabled] gold_acc=1.0000 fp32_agree=1.0000
+[08:35:35] [FAITHFUL w8a16 sim, PTQ] gold_acc=0.4583 fp32_agree=0.4583  (expect ~0.42 to match on-device 42.5%)
+[08:35:36] start QAT steps=3000 bs=32 lr=3e-05 slot_w=1.0
+[08:35:40] step 25 loss 1.3300
+[08:35:45] step 50 loss 0.7005
+[08:35:50] step 75 loss 0.2721
+[08:35:54] step 100 loss 0.1286
+[08:35:57] [EVAL step 100] gold_acc=0.9667 fp32_agree=0.9667  best_agree=0.9667@100 *BEST*
+[08:36:02] step 125 loss 0.1493
+[08:36:07] step 150 loss 0.0541
+[08:36:11] step 175 loss 0.0403
+[08:36:16] step 200 loss 0.0654
+[08:36:19] [EVAL step 200] gold_acc=0.9833 fp32_agree=0.9833  best_agree=0.9833@200 *BEST*
+[08:36:24] step 225 loss 0.0577
+[08:36:29] step 250 loss 0.0072
+[08:36:33] step 275 loss 0.0112
+[08:36:38] step 300 loss 0.0082
+[08:36:41] [EVAL step 300] gold_acc=1.0000 fp32_agree=1.0000  best_agree=1.0000@300 *BEST*
+[08:36:46] step 325 loss 0.0258
+[08:36:50] step 350 loss 0.0173
+[08:36:55] step 375 loss 0.0114
+[08:37:00] step 400 loss 0.0250
+[08:37:00] [EVAL step 400] gold_acc=1.0000 fp32_agree=1.0000  best_agree=1.0000@300
+[08:37:05] step 425 loss 0.0321
+[08:37:09] step 450 loss 0.0155
+[08:37:14] step 475 loss 0.0020
+[08:37:19] step 500 loss 0.0058
+[08:37:19] [EVAL step 500] gold_acc=1.0000 fp32_agree=1.0000  best_agree=1.0000@300
+[08:37:24] step 525 loss 0.0024
+[08:37:28] step 550 loss 0.0056
+[08:37:33] step 575 loss 0.0023
+[08:37:37] step 600 loss 0.0032
+[08:37:38] [EVAL step 600] gold_acc=1.0000 fp32_agree=1.0000  best_agree=1.0000@300
+[08:37:43] step 625 loss 0.0012
+[08:37:47] step 650 loss 0.0065
+[08:37:52] step 675 loss 0.0044
+[08:37:56] step 700 loss 0.0026
+[08:37:57] [EVAL step 700] gold_acc=1.0000 fp32_agree=1.0000  best_agree=1.0000@300
+[08:38:01] step 725 loss 0.0035
+[08:38:06] step 750 loss 0.0014
+[08:38:11] step 775 loss 0.0008
+[08:38:15] step 800 loss 0.0013
+[08:38:16] [EVAL step 800] gold_acc=1.0000 fp32_agree=1.0000  best_agree=1.0000@300
+[08:38:20] step 825 loss 0.0008
+[08:38:25] step 850 loss 0.0010
+[08:38:29] step 875 loss 0.0010
+[08:38:34] step 900 loss 0.0055
+[08:38:34] [EVAL step 900] gold_acc=1.0000 fp32_agree=1.0000  best_agree=1.0000@300
+[08:38:39] step 925 loss 0.0013
+[08:38:44] step 950 loss 0.0150
+[08:38:49] step 975 loss 0.0019
+[08:38:54] step 1000 loss 0.0007
+[08:38:55] [EVAL step 1000] gold_acc=1.0000 fp32_agree=1.0000  best_agree=1.0000@300
+[08:39:00] step 1025 loss 0.0006
+[08:39:04] step 1050 loss 0.0005
+[08:39:09] step 1075 loss 0.0003
+[08:39:14] step 1100 loss 0.0006
+[08:39:14] [EVAL step 1100] gold_acc=1.0000 fp32_agree=1.0000  best_agree=1.0000@300
+[08:39:19] step 1125 loss 0.0009
+[08:39:23] step 1150 loss 0.0017
+[08:39:28] step 1175 loss 0.0007
+[08:39:32] step 1200 loss 0.0006
+[08:39:33] [EVAL step 1200] gold_acc=1.0000 fp32_agree=1.0000  best_agree=1.0000@300

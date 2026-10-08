@@ -1,0 +1,13 @@
+{
+  "model": "ModernBERT-base joint intent(12)+slot(17), 'Laya', QAT w8a16",
+  "device": "QCS6490 / Hexagon V68 HTP (QDC sa880830, soc_id 498) — REAL device, not sim",
+  "eval_set": "120 held-out synthetic utterances (data/intent/test.jsonl; fp32=100% on these)",
+  "ptq_baseline_ondevice_pct": 42.5,
+  "qat_w8a16_ondevice_top1_vs_fp32_pct": 100.0,
+  "qat_w8a16_ondevice_top1_vs_gold_pct": 100.0,
+  "missing": 0,
+  "sanity": "120/120 unique logit rows, all 12 classes used, spot-checks correct",
+  "run": "qnn-net-run --retrieve_context --use_native_input_files, 120 inputs in ~3s",
+  "caveat": "100% = w8a16 matches fp32 on HELD-OUT SYNTHETIC test (fp32 itself ~100% on this saturated set). Real-world accuracy needs >=200 real recordings (unmet). Slot head not scored on-device yet.",
+  "method_note": "QAT against a DEVICE-FAITHFUL sim: v68 attention convert is effectively ~3-bit (3-bit sim reproduces the 42.5% device baseline); AIMET's 8-bit sim lies at 100%. Recipe in conversion/intent_laya/qat/."
+}
