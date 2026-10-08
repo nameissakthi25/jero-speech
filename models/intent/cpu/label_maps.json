@@ -1,0 +1,37 @@
+{
+  "max_len": 32,
+  "opset": 17,
+  "intent_id2label": {
+    "0": "walk",
+    "1": "turn",
+    "2": "stop",
+    "3": "dance",
+    "4": "look",
+    "5": "greet",
+    "6": "emote",
+    "7": "yes",
+    "8": "no",
+    "9": "cancel",
+    "10": "chit_chat",
+    "11": "none"
+  },
+  "slot_id2label": {
+    "0": "O",
+    "1": "B-direction",
+    "2": "I-direction",
+    "3": "B-steps",
+    "4": "I-steps",
+    "5": "B-duration",
+    "6": "I-duration",
+    "7": "B-angle",
+    "8": "I-angle",
+    "9": "B-speed",
+    "10": "I-speed",
+    "11": "B-style",
+    "12": "I-style",
+    "13": "B-target",
+    "14": "I-target",
+    "15": "B-emotion",
+    "16": "I-emotion"
+  }
+}

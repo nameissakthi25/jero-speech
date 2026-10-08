@@ -1,0 +1,24 @@
+{
+  "dataset": "hf-internal-testing/librispeech_asr_dummy (clean/validation)",
+  "n_clips": 73,
+  "total_audio_s": 481.035,
+  "total_wall_s": 17.587,
+  "rtf": 0.0366,
+  "wer": 0.3482,
+  "num_threads": 4,
+  "note": "Model is an INDIAN-ENGLISH streaming zipformer; evaluated on US-English LibriSpeech, so this WER is a rough cross-accent proxy, not a true in-domain number. RTF is on CPU with num_threads=4.",
+  "examples": [
+    {
+      "ref": "mister quilter is the apostle of the middle classes and we are glad to welcome his gospel",
+      "hyp": "filter is the possible of the middle classes and we are glad to welcome his gauss pole"
+    },
+    {
+      "ref": "nor is mister quilter s manner less interesting than his matter",
+      "hyp": "noise mister qualters manner less interesting than his matter"
+    },
+    {
+      "ref": "he tells us that at this festive season of the year with christmas and roast beef looming before us similes drawn from eating and its results occur most readily to the mind",
+      "hyp": "he tells us that at this festive season of the year with christmas and rose peming before us sim from eating and its results or most rereadly to the mind"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+.venv/
+cache/
+
+# Large model binaries synced out-of-band (see models.json / BENCHMARKS.md)
+models/tts/cpu/vits-piper-en_US-amy-medium/
+models/intent/cpu/intent.onnx
+# (STT encoder/decoder/joiner live in the zipformer repo, not here)

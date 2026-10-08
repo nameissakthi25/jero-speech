@@ -1,0 +1,64 @@
+{
+  "_comment": "Model manifest for jero-speech. sha256 filled in for present files; PENDING_A100 for models still being trained/exported. Verify on-device after sync. | 2026-10-08: restructured to models/<model>/{cpu,htp}; see BENCHMARKS.md.",
+  "models": {
+    "stt_zipformer": {
+      "name": "zipformer-enin-qairt-aimet (streaming RNN-T)",
+      "version": "v7a",
+      "runtime": "sherpa-onnx OnlineRecognizer (CPU, greedy)",
+      "status": "real",
+      "files": {
+        "encoder.onnx": "sha256:1d631ee8d3834eb809ad873afc361b563a5d8bc5ad50d131e622a9e416fc0547",
+        "decoder.onnx": "sha256:b72cea40fcc958bc8b094b2d8e06c6b693f68577680ac813746ea5d989dffa32",
+        "joiner.onnx": "sha256:a39b1ba988bb7381d33cd1562780cbe583bf16056911d5da19b968b2363576d7",
+        "tokens.txt": "sha256:e17a5be819b15fd38f3c543f3d2e73b7a10205c66d5790009f4b35ca91947b84"
+      }
+    },
+    "tts_piper_amy_medium": {
+      "name": "en_US-amy-medium (Piper VITS)",
+      "version": "medium",
+      "source": "k2-fsa/sherpa-onnx tts-models (same voice as rhasspy/piper-voices en_US-amy-medium) + espeak-ng-data",
+      "runtime": "sherpa-onnx OfflineTts (CPU, num_threads=4)",
+      "status": "real",
+      "files": {
+        "en_US-amy-medium.onnx": "sha256:fbaa8e36d8f26fe6f3ebb65cab461e629d8b37a5b7c5fb78fb64317db73e1c25",
+        "tokens.txt": "sha256:87c8ef66eae5473ed0cc0366b3964c736ca6c5f676c979522ea31234e47430b9",
+        "espeak-ng-data/": "bundled-directory"
+      },
+      "expected_path": "models/tts/cpu/vits-piper-en_US-amy-medium/"
+    },
+    "wakeword_hey_jero": {
+      "name": "hey_jero (openWakeWord)",
+      "version": "PENDING_A100",
+      "runtime": "openwakeword.Model (CPU, always-on)",
+      "status": "mock",
+      "expected_path": "models/wakeword/cpu/hey_jero.onnx",
+      "source": "~/jero/wakeword (built by wake-word agent on A100)",
+      "files": {
+        "hey_jero.onnx": "sha256:PENDING_A100"
+      }
+    },
+    "vad_silero": {
+      "name": "Silero VAD",
+      "version": "PENDING",
+      "runtime": "sherpa-onnx VoiceActivityDetector (CPU)",
+      "status": "real",
+      "expected_path": "models/vad/cpu/silero_vad.onnx",
+      "source": "~/jero/wakeword (standard silero_vad.onnx)",
+      "files": {
+        "silero_vad.onnx": "sha256:PENDING"
+      }
+    },
+    "intent_classifier": {
+      "name": "jero intent classifier",
+      "version": "PENDING_A100",
+      "runtime": "onnxruntime CPUExecutionProvider + post_process.py",
+      "status": "real (CPU fp32)",
+      "expected_path": "models/intent/cpu/intent.onnx",
+      "source": "~/jero/intent (built by intent agent on A100)",
+      "files": {
+        "intent.onnx": "sha256:PENDING_A100",
+        "post_process.py": "sha256:PENDING_A100"
+      }
+    }
+  }
+}

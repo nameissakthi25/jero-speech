@@ -1,0 +1,20 @@
+{
+  "_comment": "Silero VAD config for the Hey Jero speech pipeline. ONNX, CPU, 16 kHz. Loaded by runtime.py (VADConfig) and eval_gate5.py.",
+  "model": "silero_vad.onnx",
+  "license": "MIT (snakers4/silero-vad)",
+  "inference_framework": "onnxruntime-cpu",
+  "sampling_rate": 16000,
+  "window_size_samples": 512,
+  "threshold": 0.5,
+  "min_silence_duration_ms": 400,
+  "min_speech_duration_ms": 300,
+  "max_speech_duration_s": 6.0,
+  "speech_pad_ms": 200,
+  "notes": [
+    "window_size_samples=512 is the native Silero window at 16 kHz (32 ms/frame).",
+    "min_silence_duration_ms=400 is the trailing-silence endpoint used after wake/PTT.",
+    "min_speech_duration_ms=300 rejects short non-speech blips.",
+    "max_speech_duration_s=6.0 is the hard cap on a single captured utterance.",
+    "speech_pad_ms=200 is kept on each side of the detected speech region."
+  ]
+}

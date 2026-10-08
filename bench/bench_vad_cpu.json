@@ -1,0 +1,13 @@
+{
+  "model_version": "v4",
+  "n_speech_frames": 8736,
+  "n_nonspeech_frames": 26208,
+  "threshold": 0.5,
+  "accuracy": 0.9452,
+  "precision": 1.0,
+  "recall": 0.7807,
+  "auc": 0.9401,
+  "mean_frame_latency_ms": 0.0782,
+  "rtf": 0.00244,
+  "note": "Silero VAD v4 ONNX (h/c state [2,1,64]), CPU single-thread, 512-sample/32ms hops, state carried per clip and reset between clips. SPEECH=40 librispeech_asr_dummy clean/validation clips (all frames labeled speech=1, a known over-count: utterances contain pauses/leading-trailing silence, so recall is a lower bound). NON-SPEECH=matched-length digital silence + white noise(amp 0.05) + pink noise(amp 0.1) per clip. Latency includes per-frame run() only."
+}

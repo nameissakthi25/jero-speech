@@ -1,0 +1,76 @@
+# jero-speech configuration
+# Paths are relative to the jero-speech/ repo root unless absolute.
+
+# ------------------------------------------------------------------- trigger
+# How an utterance starts: "vad" (speech onset — no wake word, DEFAULT),
+# "ptt" (push-to-talk button), or "wakeword" ("Hey Jero"). VAD always ends it.
+trigger: vad
+
+# ---------------------------------------------------------------- audio / mic
+mic:
+  device: null          # null = system default; int index on RB3 (see `arecord -l`)
+  sample_rate: 16000    # Zipformer + wake + VAD all expect 16 kHz mono
+  channels: 1
+  frame_ms: 30
+
+# ---------------------------------------------------------------- VAD (Silero)
+# 400 ms trailing silence ends an utterance; utterances clamp to 0.3-6.0 s.
+vad:
+  model_path: models/vad/cpu/silero_vad.onnx   # TODO: lands with ~/jero/wakeword
+  threshold: 0.5
+  min_silence_ms: 400
+  min_speech_ms: 300     # 0.3 s
+  max_speech_s: 6        # 6.0 s
+
+# ------------------------------------------------------------- wake word (oww)
+wakeword:
+  model_path: models/wakeword/cpu/hey_jero.onnx     # TODO: A100 export (openWakeWord)
+  threshold: 0.5
+
+# ------------------------------------------------------------- STT (Zipformer)
+# REAL today. Points at our streaming Zipformer ONNX (sherpa-onnx OnlineRecognizer).
+stt:
+  model_dir: /Users/nameissakthi/Desktop/personal/zipformer-qcs6490/zipformer-enin-qairt-aimet/onnx_test/model
+  num_threads: 4         # RB3 CPU
+  provider: cpu
+  decoding_method: greedy_search   # on-device low-latency default
+
+# -------------------------------------------------------------------- intent
+intent:
+  model_path: models/intent/cpu/intent.onnx         # TODO: A100 export
+  post_process_path: models/intent/cpu/post_process.py
+  use_mock: false         # REAL intent.onnx wired
+  conf_threshold: 0.7     # below -> service says unclear_line + emits `unclear`
+
+# ----------------------------------------------------------------------- TTS
+tts:
+  model_dir: models/tts/cpu/vits-piper-en_US-amy-medium   # Piper en_US-amy-medium
+  cache_dir: cache/canned
+  num_threads: 4          # RB3 CPU
+  provider: cpu
+  speed: 1.0
+
+# -------------------------------------------------------------- speech policy
+self_hearing_tail_ms: 200          # ignore mic while speaking + 200 ms after
+say_stop_line_on_stop: true        # speak "Stopping." (safety) on a STOP
+stop_line: "Stopping."
+unclear_line: "Sorry, say that again?"
+
+# stop fast-path trigger words (matched on raw ASR text, intent model skipped)
+stop_words:
+  - stop
+  - jero stop
+  - hey jero stop
+  - halt
+  - freeze
+
+# canned lines pre-rendered to cache/canned/ at startup
+canned_lines:
+  - "Hi, I'm Jero!"
+  - "Let's dance!"
+  - "Ta-da!"
+  - "Oops!"
+  - "Sorry, say that again?"
+  - "Walking forward."
+  - "Turning left."
+  - "Stopping."

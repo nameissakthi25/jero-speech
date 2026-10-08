@@ -1,0 +1,11 @@
+{
+  "intent_acc": 1.0,
+  "slot_f1": 1.0,
+  "none_leak_pct": 0.0,
+  "precision_at_conf": 1.0,
+  "conf_threshold": 0.7,
+  "coverage_pct": 100.0,
+  "temperature": 0.6315432786941528,
+  "n_test": 444,
+  "skipped": 0
+}

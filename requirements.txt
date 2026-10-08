@@ -1,0 +1,9 @@
+# jero-speech runtime deps (aarch64 wheels exist for all of these)
+sherpa-onnx>=1.13.8     # STT (OnlineRecognizer) + TTS (OfflineTts) + VAD
+onnxruntime>=1.17       # intent.onnx inference
+openwakeword>=0.6       # wake word "hey jero" (when model lands)
+silero-vad>=5.1         # VAD (alt to sherpa-onnx VAD helper)
+numpy>=1.24
+soundfile>=0.12
+sounddevice>=0.4        # mic capture on device
+pyyaml>=6.0

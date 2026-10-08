@@ -1,0 +1,22 @@
+[Unit]
+Description=Jero speech service (wake + STT + intent + TTS)
+After=sound.target network-online.target
+Wants=sound.target
+
+[Service]
+Type=simple
+# Adjust to the deploy user/location on the RB3.
+User=ubuntu
+WorkingDirectory=/home/ubuntu/jero/jero-speech
+Environment=PYTHONUNBUFFERED=1
+# Always-on parts run on CPU; pin to the big cores if desired (taskset).
+ExecStartPre=/home/ubuntu/jero/jero-speech/.venv/bin/python -m brain.speech.prerender
+ExecStart=/home/ubuntu/jero/jero-speech/.venv/bin/python -m brain.speech --mic
+Restart=on-failure
+RestartSec=3
+# Keep memory modest on the 5.2 GB board.
+MemoryMax=1500M
+Nice=-5
+
+[Install]
+WantedBy=multi-user.target
