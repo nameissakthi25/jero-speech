@@ -1,10 +1,10 @@
 # jero-speech
 
-> **Status (2026-10-08):** STT, TTS, VAD, intent + wake word all built. STT runs **w8a16 on the
-> Hexagon V68 HTP** (token-exact); TTS (Supertonic-3) runs **w8a16 on HTP**; intent runs **fp32 on CPU**
-> (w8a16 hit a fidelity ceiling); VAD + wake word are **CPU by design**. Every model has `cpu/` + `htp/`
-> folders under `models/`. Measured numbers + HTP-vs-CPU correlations: **see `BENCHMARKS.md`**.
-> (The "REAL vs MOCKED" table below predates the real model drops; `BENCHMARKS.md` / `PROGRESS.md` are current.)
+> **Status (2026-10-08):** STT, TTS, VAD, intent + wake word all built and benchmarked on-device.
+> STT (Zipformer) and TTS (Supertonic-3) run **w8a16 on the Hexagon V68 HTP**; **intent (ModernBERT
+> "Laya") now runs w8a16 on HTP at 100% via QAT** (PTQ was capped at 42%); VAD + wake word are
+> **CPU by design**. Every model has `cpu/` + `htp/` folders under `models/`. Measured numbers +
+> HTP-vs-CPU correlations: **see `BENCHMARKS.md`**.
 
 
 Speech stack for the Jero robot: **wake word -> VAD -> STT -> intent -> TTS**, with
@@ -21,13 +21,14 @@ verified on macOS (arm64); all deps have aarch64 wheels.
 | **TTS** (Piper en_US-amy-medium, sherpa-onnx OfflineTts) | ✅ REAL | voice + espeak-ng-data downloaded; 8 canned lines pre-rendered; CPU num_threads=4 |
 | **STT** (Zipformer, sherpa-onnx OnlineRecognizer) | ✅ REAL | our `zipformer-enin-qairt-aimet` model; greedy, CPU |
 | **SpeechService** glue (queue, events, safety, fast-path, self-hearing) | ✅ REAL | full implementation, measured latencies below |
-| **Intent** classifier | 🟡 MOCK | keyword classifier in `loaders.IntentModel._mock_infer`; swap for `intent.onnx` |
-| **Wake word** "hey jero" (openWakeWord) | 🟡 MOCK | `loaders.WakeWordDetector`; swap for `hey_jero.onnx` |
-| **VAD** (Silero) | 🟡 MOCK | `loaders.VoiceActivityDetector`; swap for `silero_vad.onnx` |
+| **Intent** classifier (ModernBERT "Laya") | ✅ REAL | `intent.onnx` wired via `loaders.IntentModel`; fp32 CPU 100%/28 ms, **QAT w8a16 = 100% on V68 HTP**. Mock keyword fallback remains only if the file is absent. |
+| **Wake word** "hey jero" (openWakeWord) | ✅ REAL | `hey_jero.onnx` present at `models/wakeword/cpu/`; loaded by `loaders.WakeWordDetector`. gate-5 (synthetic): 2.2% miss, 0 FA/hr. |
+| **VAD** (Silero v4) | ✅ REAL | `silero_vad.onnx` present at `models/vad/cpu/`; loaded via sherpa-onnx `VoiceActivityDetector`. **Benchmarked: 94.5% acc, AUC 0.94, 0.078 ms/frame.** |
 | **asr_conf** value | 🟡 PLACEHOLDER | 0.9 for any transcript (build has no token probs); field/shape final |
 
-The MOCKs are transparent stand-ins so the **end-to-end event flow runs today on
-text**. They are not accuracy stand-ins for the trained models.
+Each loader loads the **real** model when its file is present (all three are now) and sets
+`.is_real`; a transparent mock/keyword fallback only kicks in if a file is missing, so the
+end-to-end flow still runs on text in a bare checkout. See `BENCHMARKS.md` for measured numbers.
 
 ## Quick start (Mac dev)
 
